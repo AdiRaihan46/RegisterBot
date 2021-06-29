@@ -2,7 +2,7 @@ const { Client } = require("discord.js");
 const db = require("quick.db");
 const bot = new Client();
 const prefix = ".";
-const token = "ODQ2NjM2OTUxMDIwODk2Mjg2.YKyaGg.eJsEW--Z51obXtNtkujOEc2fSrQ"; // TOKEN BOT KAMU
+const token = "YOUR TOKEN"; // TOKEN BOT KAMU
 
 
 bot.on("ready", () => {
