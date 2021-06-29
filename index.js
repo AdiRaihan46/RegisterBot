@@ -1,7 +1,7 @@
 const { Client } = require("discord.js");
 const db = require("quick.db");
 const bot = new Client();
-const prefix = ".";
+const prefix = "YOUR PREFIX"; //PREFIX BOT KAMU
 const token = "YOUR TOKEN"; // TOKEN BOT KAMU
 
 
