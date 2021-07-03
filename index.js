@@ -147,8 +147,48 @@ bot.on("message", message => {
   }
       break;
       
+      case "report": {
+ let user = message.mentions.users.first()
+    if (!user) return message.channel.send('Silahkan Tag Player Yg Akan Direport')
+
+    let reason = args.slice(1).join(" ")
+    if (!reason) return message.channel.send("Silahkan Masukan Alasan Anda")
+
+    let Avatar = user.displayAvatarURL();
+    let Channel = message.guild.channels.cache.find((ch) => ch.name === "⛔report-player❗ooc❗"); //masukan channel report
+    if (!Channel) return message.channel.send("Channel Report Eror,Silahkan Tag Moderator/Bot Handle Untuk Dibenarkan");
+
+    const { MessageEmbed } = require("discord.js")
+    const embed = new MessageEmbed()
+    .setTitle('New Report!')
+    .setDescription(`Player \`${message.author.tag}\` Telah Mereport Player \`${user.tag}\`!`)
+    .setColor("RED")
+    .setThumbnail(Avatar)
+    .addFields(
+        { name: "Member ID", value: `${message.author.id}`, inline: true},
+        { name: "Member Tag", value: `${message.author.tag}`, inline: true},
+        { name: "Reported ID", value: `${user.id}`, inline: true},
+        { name: "Reported Tag", value: `${user.tag}`, inline: true},
+        { name: "Reason", value: `${reason}`, inline: true}
+    )
+    Channel.send(embed)
+    message.channel.send('Terimakasih Telah Mereport,Tunggu Hingga Kami Respon!')
+
+}
+      break
       
-        }
+      case "botsleep": {
+      message.channel.send('Sleeping The Bot...')
+.then((msg)=> {
+  setTimeout(function(){
+    msg.edit('Bot Offline Dalam 5 Menit ,See You...');
+  }, 5000)
+});
+   message.delete(); 
+    }
+      break;
+      
+  }
 })
 
 bot.login(token);
