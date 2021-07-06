@@ -22,10 +22,49 @@ bot.on("ready", () => {
 });
 
 bot.on("message", message => {
+  if (message.author.bot) return false;
+
+    if (message.content.includes("@here") || message.content.includes("@everyone")) return false;
+
+    if (message.mentions.has(bot.user.id)) {
+        message.channel.send(`\nMy prefix for \`${message.guild.name}\` is \`${prefix}\` Type \`${prefix}help\` for help | **Manado Roleplay Team**`);
+    };
+    // checks if the message author is afk
+    if (db.has(message.author.id + '.afk')) {
+        message.reply("Oh you're back ! i removed your afk")
+        db.delete(message.author.id + '.afk')
+        db.delete(message.author.id + '.messageafk')
+    }
+    if (message.content.includes('>afk')) {
+        message.member.setNickname(`[AFK] ${message.author.username}`).catch(error => message.channel.send("You're AFK Now"));
+        // then here you use the database :
+        db.set(message.author.id + '.afk', 'true')
+        db.set(message.author.id + '.messageafk', message.content.split(' ').slice(2))
+
+        // I made .slice(2) so that in the message array it also delete the command and the "start-afk"
+    }
+    if (message.content.includes('>endafk')) {
+        message.member.setNickname('').catch(error => message.channel.send("Couldn't update your nickname."));
+        // Here you delete it
+        db.delete(message.author.id + '.afk')
+        db.delete(message.author.id + '.messageafk')
+    }
+  
+  message.mentions.users.forEach(user =>{
+  if (message.author.bot) return false;
+
+    if (message.content.includes("@here") || message.content.includes("@everyone")) return false;
+if(db.has(user.id + '.afk')) message.channel.send(`${message.author}, the user you mentioned is currently AFK.. Leave a message if urgent by DMing him`)
+})
+  
+  if(message.author.bot || message.channel.type === "dm") return;
+
   let args = message.content.substring(prefix.length).split(" ");
   if (!message.content.startsWith(prefix)) return;
   switch (args[0]) {
-    case "register":
+    
+    
+    case "name":
       if (message.channel.type == "dm")
         return message.channel.send("Kamu tidak bisa registrasi dari DM");
       const shifter = args.shift();
@@ -35,16 +74,16 @@ bot.on("message", message => {
       if (nick.length > 32)
         return message.channel.send("Nickname terlalu panjang, mohon berikan yang lebih singkat"
         );
-      if (message.channel.id !== "818875660788301911")
+      if (message.channel.id !== "857257140888797204")
         return message.channel.send("**You Can't Register Here!**,Gak Bisa Basa Inggris? Nih Gua Terjemahin `(kamu tidak bisa register disini)` Richo-Dev"
         );
       try {
-        message.member.roles.add("818875659647844390"); //Role Yang Mau DiSet
+        message.member.roles.add("861279669026291763"); //Role Yang Mau DiSet
         message.member.setNickname(nick);
-        return message.reply("**Telah Diregistrasi**");
+        return message.reply("**Nama Kamu Telah Di setting | Happy Roleplay**");
       } catch (e) {
-        return message.channel.send("Ada sebuah kesalahan disaat melaksanakan command."
-        );
+        
+        return message.channel.send("Ada sebuah kesalahan disaat melaksanakan command.");
       }
       break;
 
@@ -87,13 +126,16 @@ bot.on("message", message => {
     case "help": {
         const { MessageEmbed } = require("discord.js");
         const embed = new MessageEmbed()
-          .setTitle(`⛑__**Help Command ${prefix}help**__`)
-          .addField(`🔔 ${prefix}register`, `Untuk Register Role Discord`)
-          .addField(`♻️ ${prefix}ping`, `Untuk Mengetahui Ping Kamu`)
-          .addField(`⏰ ${prefix}uptime`, `Untuk Melihat Berapa Waktu Yg Bot Gunakan`)
-          .addField(`⛑ ${prefix}help`, `Untuk Mengatahui Cmd Bot`)
-          .addField(`👑 ${prefix}Info`, `Command Ini Hanya Bisa Digunakan Oleh Administrator | Harap Gunakan **I** Besar,Contoh .Info`)
-          .addField(`👋 ${prefix}link`, `Link Discord Server Dan Whatsapp`)
+          .setTitle(`__**Help Command ${prefix}help**__`)
+          .addField(`${prefix}name`, `Untuk Mengganti Nama Kamu`)
+          .addField(`${prefix}ping`, `Untuk Mengetahui Ping Kamu`)
+          .addField(`${prefix}uptime`, `Untuk Melihat Berapa Waktu Yg Bot Gunakan`)
+          .addField(`${prefix}help`, `Untuk Mengatahui Cmd Bot`)
+          .addField(`${prefix}Info`, `Command Ini Hanya Bisa Digunakan Oleh Administrator | Harap Gunakan **I** Besar,Contoh .Info`)
+          .addField(`${prefix}link`, `Link Discord Server Dan Whatsapp`)
+          .addField(`${prefix}userinfo`, `Untuk Melihat Profil Kamu`)
+          .addField(`${prefix}serverinfo`, `Untuk Melihat Info Server`)
+          .addField(`${prefix}meme`, `Meme Bot Command`)
           .setColor("RANDOM")
           .setDescription("Masih Butuh Perbaikan Hehe")
           .setFooter(`${bot.user.username}`)
@@ -178,14 +220,100 @@ bot.on("message", message => {
       break
       
       case "botsleep": {
-      message.channel.send('Sleeping The Bot...')
-.then((msg)=> {
-  setTimeout(function(){
-    msg.edit('Bot Offline Dalam 5 Menit ,See You...');
-  }, 5000)
-});
-   message.delete(); 
+      if(message.author.id != "745923074179989605") return message.channel.send("You're the bot the owner!")
+
+    try {
+         return message.channel.send("Bot is shutting down...")
+        process.exit()
+    } catch(e) {
+        message.channel.send(`ERROR: ${e.message}`)
     }
+      }
+      break;
+      
+    case "reload": {
+      if(message.author.id != "745923074179989605") return message.channel.send("You're the bot the owner!")
+
+    if(!args[0]) return message.channel.send("Please provide a command to reload!")
+
+    let commandName = args[0].toLowerCase()
+
+    try {
+        delete require.cache[require.resolve(`./${commandName}.js`)] // usage !reload <name>
+        bot.commands.delete(commandName)
+        const pull = require(`./${commandName}.js`)
+        bot.commands.set(commandName, pull)
+    } catch(e) {
+        return message.channel.send(`Could not reload: \`${args[0].toUpperCase()}\``)
+    }
+
+    message.channel.send(`The command \`${args[0].toUpperCase()}\` has been reloaded!`)
+
+}
+      break;
+      
+    case "serverinfo": {
+      if(!message.member.hasPermission(["MANAGE_MESSAGES", "ADMINISTRATOR"])) return message.channel.send("You can not use this command!")
+      const { MessageEmbed } = require("discord.js")
+      const embed = new MessageEmbed()
+  .setAuthor(message.guild.name, message.guild.iconURL)
+  .setColor("RANDOM")
+  .setDescription(`Owner: ${message.guild.owner.user.tag} (${message.guild.owner.id})`)
+  .addField('Member Count', `${message.guild.memberCount - message.guild.members.filter(m=>m.user.bot).size}`, true)
+  .addField('AFK Timeout', `${message.guild.afkTimeout / 60} minutes`, true)
+  .addField('AFK Channel', `${message.guild.afkChannelID === null ? 'No AFK Channel' : bot.channels.get(message.guild.afkChannelID).name} (${message.guild.afkChannelID === null ? '' : message.guild.afkChannelID})`, true)
+  .addField('Location', message.guild.region, true)
+  .addField('Created', message.guild.createdAt.toLocaleString(), true)
+  .addBlankField(true)
+  .setFooter(bot.user.username, bot.user.avatarURL);
+
+  message.channel.send(embed);
+}
+      break;
+      
+    case "userinfo": {
+     const { MessageEmbed } = require("discord.js")
+      const embed = new MessageEmbed()
+    .setColor("RANDOM")
+    .setTitle("Server Info")
+    .setThumbnail(message.guild.iconURL)
+    .setAuthor(`${message.author.username}`, message.author.displayAvatarURL)
+    .addField("**Username:**", `${message.author.username}`, true)
+    .addField("**Discriminator:**", `${message.author.discriminator}`, true)
+    .addField("**ID:**", `${message.author.id}`, true)
+    .addField("**Status:**", `${message.author.presence.status}`, true)
+    .addField("**Created At:**", `${message.author.createdAt}`, true)
+    .setFooter(`ManadoRp | Team Bot`, bot.user.displayAvatarURL);
+
+    message.channel.send(embed);
+}
+      break;
+      
+    case "meme": {
+      const { MessageEmbed } = require("discord.js")
+      const embed = new MessageEmbed();
+	got('https://www.reddit.com/r/memes/random/.json')
+		.then(response => {
+			const [list] = JSON.parse(response.body);
+			const [post] = list.data.children;
+
+			const permalink = post.data.permalink;
+			const memeUrl = `https://reddit.com${permalink}`;
+			const memeImage = post.data.url;
+			const memeTitle = post.data.title;
+			const memeUpvotes = post.data.ups;
+			const memeNumComments = post.data.num_comments;
+
+			embed.setTitle(`${memeTitle}`);
+			embed.setURL(`${memeUrl}`);
+			embed.setColor('RANDOM');
+			embed.setImage(memeImage);
+			embed.setFooter(`👍 ${memeUpvotes} 💬 ${memeNumComments}`);
+
+			message.channel.send(embed);
+		})
+		.catch(console.error);
+};
       break;
       
   }
