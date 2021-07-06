@@ -1,7 +1,7 @@
 {
-  "name": "BOT MANADO ROLEPLAY",
-  "version": "0.1.1",
-  "description": "Bot By Richo-Dev",
+  "name": "RegisterBot",
+  "version": "0.0.1",
+  "description": "Bot By Richo-Dev | discord.io/GbTeam",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -18,7 +18,7 @@
     "node": "12.x"
   },
   "repository": {
-    "url": "https://github.com/RegisterBot"
+    "url": "https://github.com/AdiRaihan46/RegisterBot"
   },
   "keywords": [
     "node",
