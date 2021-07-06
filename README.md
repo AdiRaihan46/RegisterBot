@@ -12,6 +12,7 @@
 # Info Script
 - Bot Ini Adalah Reedit Script Dari Mas RamaPutra
 - Script Ini Tidak Berubah Melainkan Hanya Penambahan Beberapa Command
+- [Video Ori](https://youtu.be/BICI7vm4QE4) Ini Adalah Video Ori Dari Channel Mas Rama ,Saya Sudah Izin Reedit
 
 # Script Bot
 - [Glitch.com](https://glitch.com) Bagi Kalian Yang Ingin Menjalankan Bot Lewat Glitch
