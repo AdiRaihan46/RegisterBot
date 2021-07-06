@@ -253,22 +253,23 @@ if(db.has(user.id + '.afk')) message.channel.send(`${message.author}, the user y
       break;
       
     case "serverinfo": {
-      if(!message.member.hasPermission(["MANAGE_MESSAGES", "ADMINISTRATOR"])) return message.channel.send("You can not use this command!")
-      const { MessageEmbed } = require("discord.js")
-      const embed = new MessageEmbed()
-  .setAuthor(message.guild.name, message.guild.iconURL)
-  .setColor("RANDOM")
-  .setDescription(`Owner: ${message.guild.owner.user.tag} (${message.guild.owner.id})`)
-  .addField('Member Count', `${message.guild.memberCount - message.guild.members.filter(m=>m.user.bot).size}`, true)
-  .addField('AFK Timeout', `${message.guild.afkTimeout / 60} minutes`, true)
-  .addField('AFK Channel', `${message.guild.afkChannelID === null ? 'No AFK Channel' : bot.channels.get(message.guild.afkChannelID).name} (${message.guild.afkChannelID === null ? '' : message.guild.afkChannelID})`, true)
-  .addField('Location', message.guild.region, true)
-  .addField('Created', message.guild.createdAt.toLocaleString(), true)
-  .addBlankField(true)
-  .setFooter(bot.user.username, bot.user.avatarURL);
-
-  message.channel.send(embed);
-}
+      const ServerLogo = message.guild.iconURL();
+            const { MessageEmbed } = require("discord.js")
+            const ServerInfoEmbed = new MessageEmbed()
+                .setColor('RANDOM')
+                .setTitle("Server Info")
+                .setImage(ServerLogo)
+                .setDescription(`About **${message.guild}**`)
+                .addField("**Date Created**", `Server Created on **${message.guild.createdAt.toLocaleString()}**`)
+                .addField("**Owner**", `The Owner of This Server is ${message.guild.owner}`)
+                .addField("**Member Count**", "This Server Has ` " + `${message.guild.memberCount}` + " ` **Members**")
+                .addField("**Emoji Count**", "This Server Has ` " + `${message.guild.emojis.cache.size}` + " ` **Emojis**")
+                .addField("**Roles Count**", "This Server Has ` " + `${message.guild.roles.cache.size}` + " ` **Roles**")
+                .addField("**Channels Count**", "This Server Has ` " + `${message.guild.channels.cache.size}` + " ` **Channels**")
+                .addField("**Server Logo**", "**Downlaod Server Logo**")
+                .setURL(ServerLogo)
+            message.channel.send(ServerInfoEmbed)
+        }
       break;
       
     case "userinfo": {
