@@ -7,15 +7,9 @@ const token = "YOUR TOKEN"; // TOKEN BOT KAMU
 
 bot.on("ready", () => {
   console.log(`${bot.user.username} Sudah Online - Reedit Richo`);
-
-  var time = new Date();
-            Date.prototype.timeNow = function () {
-                return ((this.getHours() < 10)?"0":"") + this.getHours() +":"+ ((this.getMinutes() < 10)?"0":"") + this.getMinutes();
-            }
-            var wtime = time.timeNow();
   
   bot.user
-    .setActivity(`${prefix}help | Timer ${wtime} |  Manado Roleplay Indonesia`, {
+    .setActivity(`${prefix}help |  Manado Roleplay Indonesia`, {
       type: "PLAYING"
     })
     .catch(console.error);
@@ -64,7 +58,7 @@ if(db.has(user.id + '.afk')) message.channel.send(`${message.author}, the user y
   switch (args[0]) {
     
     
-    case "name":
+    case "register":
       if (message.channel.type == "dm")
         return message.channel.send("Kamu tidak bisa registrasi dari DM");
       const shifter = args.shift();
@@ -74,13 +68,13 @@ if(db.has(user.id + '.afk')) message.channel.send(`${message.author}, the user y
       if (nick.length > 32)
         return message.channel.send("Nickname terlalu panjang, mohon berikan yang lebih singkat"
         );
-      if (message.channel.id !== "857257140888797204")
-        return message.channel.send("**You Can't Register Here!**,Gak Bisa Basa Inggris? Nih Gua Terjemahin `(kamu tidak bisa register disini)` Richo-Dev"
+      if (message.channel.id !== "857257140888797204") //Id Channel register
+        return message.channel.send("**You Can't Register Here!**,Gak Bisa Basa Inggris? Nih Gua Terjemahin `(kamu tidak bisa register disini)`"
         );
       try {
         message.member.roles.add("861279669026291763"); //Role Yang Mau DiSet
         message.member.setNickname(nick);
-        return message.reply("**Nama Kamu Telah Di setting | Happy Roleplay**");
+        return message.reply("**Accept!** Terimakasih Telah Register"); //Bisa diganti Sesuka hati
       } catch (e) {
         
         return message.channel.send("Ada sebuah kesalahan disaat melaksanakan command.");
@@ -127,7 +121,7 @@ if(db.has(user.id + '.afk')) message.channel.send(`${message.author}, the user y
         const { MessageEmbed } = require("discord.js");
         const embed = new MessageEmbed()
           .setTitle(`__**Help Command ${prefix}help**__`)
-          .addField(`${prefix}name`, `Untuk Mengganti Nama Kamu`)
+          .addField(`${prefix}register`, `Untuk Register Role Dan Nama Discord`)
           .addField(`${prefix}ping`, `Untuk Mengetahui Ping Kamu`)
           .addField(`${prefix}uptime`, `Untuk Melihat Berapa Waktu Yg Bot Gunakan`)
           .addField(`${prefix}help`, `Untuk Mengatahui Cmd Bot`)
