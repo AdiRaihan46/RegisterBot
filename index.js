@@ -1,10 +1,13 @@
 const { Client } = require("discord.js");
 const db = require("quick.db");
 const bot = new Client();
-const prefix = "YOUR PREFIX"; //PREFIX BOT KAMU
+const prefix = ">"; //PREFIX BOT KAMU
+const { MessageEmbed } = require("discord.js")
 const got = require("got")
 const fetch = require("node-fetch")
 const ms = require('ms');
+const readline = require("readline")
+const pagination = require("discord.js-pagination")
 const token = "YOUR TOKEN"; // TOKEN BOT KAMU
 
 const welcome = require("./welcome");
@@ -12,13 +15,27 @@ const welcome = require("./welcome");
 bot.on("ready", () => {
   console.log(`${bot.user.username} Sudah Online - Reedit Richo`);
 
-  bot.user.setActivity(`${prefix}help | Manado Roleplay Indonesia`, {
+  bot.user.setActivity(`${prefix}help | Rebelion Roleplay Indonesia`, {
       type: "PLAYING"
     })
     .catch(console.error);
 });
 
+
 bot.on("message", message => {
+  if (message.channel.type === 'dm'){ 
+        console.log(`${message.author.username} says: ${message.content}`);
+        const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
+
+        rl.question(`REPLY TO ${message.author.username}: `, (answer) => {
+            message.author.send(`${answer}`);
+            rl.close();
+        });
+
+    }
   if (message.author.bot) return false;
 
     if (message.content.includes("@here") || message.content.includes("@everyone")) return false;
@@ -75,8 +92,77 @@ if(db.has(user.id + '.afk')) message.channel.send(`${message.author}, the user y
     }
 }
   
-  if(message.author.bot || message.channel.type === "dm") return;
+bot.on('messageDelete', message => {
+  const CHANNEL = '♻〃discord-logs';
+  if (message.channel.type == 'text') {
+    var logger = message.guild.channels.find(
+      channel => channel.name === CHANNEL
+    );
+    if (logger) {
+      const { MessageEmbed } = require("discord.js")
+      const embed = new MessageEmbed()
+        .setTitle('Message Deleted')
+        .addField('Author', message.author.username)
+        .addField('Message', message.cleanContent)
+        .setThumbnail(message.author.avatarURL)
+        .setColor('0x00AAFF');
+      logger.send({ embed });
+    }
+  }
+});
 
+bot.on('guildMemberAdd' , guildMember =>{
+    let welcomeRole = guildMember.guild.roles.cache.find(r => r.id === "")
+    const { MessageEmbed } = require("discord.js")
+    const embed = new MessageEmbed()
+    guildMember.roles.add(welcomeRole);
+    guildMember.guild.channels.cache.get('874252111498604564').send(embed)
+    embed.setTitle(`<@${guildMember.user.id}> Welcome or server!`)
+    embed.setDescription(`<@${guildMember.user.id}> Selamat datang di Rebelion Roleplay`)
+    embed.setThumbnail(guildMember.user.displayAvatarURL())
+});
+    
+  if(message.content === "📬〃invite-logs"){
+        var user = null;
+        user = message.author;
+
+        message.guild.fetchInvites()
+        .then
+
+        (invites =>
+            {
+                const userInvites = invites.array().filter(o => o.inviter.id === user.id);
+                var userInviteCount = 0;
+                    for(var i=0; i < userInvites.length; i++)
+                    {
+                        var invite = userInvites[i];
+                        userInviteCount += invite['uses'];
+                    }
+                        message.reply(`You have invited ${userInviteCount} user(s) to this server. Keep up the good work!`);
+            }
+        )
+}
+
+  if(message.content === ">invites"){
+        var user = message.author;
+
+        message.guild.fetchInvites()
+        .then
+
+        (invites =>
+            {
+                const userInvites = invites.array().filter(o => o.inviter.id === user.id);
+                var userInviteCount = 0;
+                for(var i=0; i < userInvites.length; i++)
+                {
+                    var invite = userInvites[i];
+                    userInviteCount += invite['uses'];
+                }
+                     message.reply(`You have ${userInviteCount} invites.`);
+            }
+        )
+    }
+  
   let args = message.content.substring(prefix.length).split(" ");
   if (!message.content.startsWith(prefix)) return;
   switch (args[0]) {
@@ -315,31 +401,22 @@ if(db.has(user.id + '.afk')) message.channel.send(`${message.author}, the user y
       break;
       
     case "tweet": {
-      fetch(`https://nekobot.xyz/api/imagegen?type=tweet&username=${message.author.username}&text=${args.join(' ')}`)
-        .then((res) => res.json())
-        .then((data) => {
-            const { MessageEmbed } = require("discord.js")
-            const embed = new MessageEmbed()
-            .setTitle("Tweet!")
-            .setImage(data.message)
-            .setTimestamp()
-            message.channel.send(embed)
-        })
-    }
-      break;
-      
-    case "sm": {
-      if(!message.member.hasPermission("ADMINISTRATOR")) {
-            return message.reply("You don't have enough perms to use this command!")
-        }
-        let duration = args[0]
-        if(isNaN(duration)) return message.reply("Please give the time in seconds.")
-        let reason = args.slice(1).join(" ")
-        if(!reason) return message.reply("Please specify a reason!")
-        
-        message.channel.setRateLimitPerUser(duration, reason)
-        message.reply(`Successfully set the slowmode to ${duration} seconds with Reason - ${reason}`)
-    }
+      const text = args.slice(0).join(' ');
+    if (!text) return message.reply("Pliss input the text!!");
+    fetch(
+      `https://nekobot.xyz/api/imagegen?type=tweet&username=${message.author.username}&text=${text}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+
+        let embed = new MessageEmbed()
+          .setTitle("Tweet!")
+          .setColor("RANDOM")
+          .setImage(data.message)
+          .setTimestamp();
+        message.channel.send(embed);
+      });
+  }
       break;
       
     case "nuked": {
@@ -415,7 +492,101 @@ if(!message.guild.members.cache.get(user.id).roles.cache.has(role.id)) return me
             } else {message.reply("You do not have enough permissions for this command.")}
         break;
     }
+      
+    case "halo bot": {
+      message.channel.send('Halo...')
+.then((msg)=> {
+  setTimeout(function(){
+    msg.edit('I Love You 😘');
+  }, 1000)
+})
+    }
+      break;
+      
+    case "help": {
+      const { MessageEmbed } = require("discord.js")
+    const page1 = new MessageEmbed()
+    .setColor('RANDOM')
+    .setTitle('**> Moderation**')
+    .setDescription('`help ,serverinfo ,userinfo ,rr ,unbanall ,ping ,uptime ,timer ,slowmode(sm)`')
+
+    const page2 = new MessageEmbed()
+    .setColor('RANDOM')
+    .setTitle('**> Server**')
+    .setDescription('`register ,report ,web`')
+    
+    const page3 = new MessageEmbed()
+    .setColor('RANDOM')
+    .setTitle('**> Citizen**')
+    .setDescription('`meme ,tweet ,halo bot ,reportbot`')
+    .setFooter('Rebelion Team')
+
+    const pages = [
+        page1,
+        page2,
+        page3
+    ]
+
+    const emoji = ["⏪", "⏩"]
+
+    const timeout = '10000'
+
+    pagination(message, pages, emoji, timeout)
+}
   
+      break;
+      
+    case "serverip": {
+      message.channel.send('**📊Sedang Mencari Ip Server.......**')
+.then((msg)=> {
+  setTimeout(function(){
+    msg.edit('I Love You 😘 aowkwowkw🤣 ,ip ip bapakkau req dulu paok!');
+  }, 5000)
+})
+    }
+      break;   
+      
+    case "ban": {
+        if(!message.member.hasPermission("BAN_MEMBERS")) return message.channel.send('You can\'t use that!')
+        if(!message.guild.me.hasPermission("BAN_MEMBERS")) return message.channel.send('I don\'t have the right permissions.')
+
+        const member = message.mentions.members.first() || message.guild.members.cache.get(args[0]);
+
+        if(!args[0]) return message.channel.send('Please specify a user');
+
+        if(!member) return message.channel.send('Can\'t seem to find this user. Sorry \'bout that :/');
+        if(!member.bannable) return message.channel.send('This user can\'t be banned. It is either because they are a mod/admin, or their highest role is higher than mine');
+
+        if(member.id === message.author.id) return message.channel.send('Bruh, you can\'t ban yourself!');
+
+        let reason = args.slice(1).join(" ");
+
+        if(!reason) reason = 'Unspecified';
+
+        member.ban(`${reason}`).catch(err => { 
+          message.channel.send('Something went wrong')
+            console.log(err)
+        })
+
+        const banembed = new MessageEmbed()
+        .setTitle('Member Banned')
+        .setThumbnail(member.user.displayAvatarURL())
+        .addField('User Banned', member)
+        .addField('Kicked by', message.author)
+        .addField('Reason', reason)
+        .setFooter('Time kicked', bot.user.displayAvatarURL())
+        .setTimestamp()
+
+        message.channel.send(banembed);
+
+
+ 
+
+        
+
+
+    }
+      
       welcome(bot);
   }
 });
